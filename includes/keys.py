@@ -1,4 +1,4 @@
-mongo = 'mongodb+srv://admin:LGldRZSmqf8NZ2fT@florax.ymkazk0.mongodb.net/?retryWrites=true&w=majority'
+mongo = 'mongodb+srv://admin:gNEKiX1FmIinFcZ7@florax.ymkazk0.mongodb.net/?retryWrites=true&w=majority'
 openweathermap = '077c227de8d61547f89391de738e5697'
 plant_id = 'DAlMijT1rMzdubg9NXXxoNd01ZUX2aYlHadZXzf1DI0dNOKvO6'
 twilio_account_sid = 'AC4f41728151d4dd8993154a209f367164'
