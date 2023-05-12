@@ -9,7 +9,7 @@ app = Flask(__name__)
 api = Api(app)
 
 mongo_client = MongoClient(keys.mongo)
-db = mongo_client.floraxdb
+db = mongo_client.florax
 users_collection = db.users
 plants_collection = db.plants
 disease_collection = db.diseases
