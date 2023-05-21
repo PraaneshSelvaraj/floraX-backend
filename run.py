@@ -112,9 +112,8 @@ get_weather_args.add_argument('city',required=True, type=str, help="City is requ
 class Create_User(Resource):
     def put(self):
         args = create_user_args.parse_args()
-        # user = users_collection.find_one({'username': args.username})
-        return {"message":"User Created Successfully", 'valid':'true'}
-
+        user = users_collection.find_one({'username': args.username})
+        
         if user: abort(409, message="User already exists.")
         else:
             args['date_created'] = datetime.utcnow()
@@ -130,18 +129,13 @@ class Get_Username(Resource):
 class Login_User(Resource):      
     def put(self):
         args = login_user_args.parse_args()
-        if args['email'] == 'test@gmail.com' and args['password'] == 'test':
-            resp = {"valid":'true'}
-            print(resp)
-            return resp
-        
+        user = users_collection.find_one({'email': args.email})
+        if not user:
+            return {'message':'User not found', 'valid':'false'}
+        if user['password'] != args.password:
+            return {'message':'Invalid Credentials', 'valid':'false'}
         else:
-            return {"valid":'false'}
-
-        # user = users_collection.find_one({'username': args.username})
-        # if not user:
-        #     return {'message':'User already exits', 'valid':'false'}
-
+            return {"valid":"true"}
 class Get_Disease(Resource):
     def put(self):
         args = get_disease.parse_args()
