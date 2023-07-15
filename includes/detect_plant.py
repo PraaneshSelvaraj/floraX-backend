@@ -2,7 +2,7 @@ import requests
 import json
 import base64
 from includes import keys
-from includes import message
+# from includes import message
 
 def detect_plant(image):
     url = 'https://api.plant.id/v2/identify'
@@ -54,7 +54,7 @@ def detect_diesease(image):
             data['healthy'] = resp['health_assessment']['is_healthy']
             data['health_probality'] = resp['health_assessment']['is_healthy_probability']
             data['disease'] = resp['health_assessment']['diseases'][0]['name']
-            message.send_message('+919629930357', data['disease'])
+            # message.send_message('+919629930357', data['disease'])
             return data
         else: return None
 

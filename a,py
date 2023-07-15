@@ -1,0 +1,38 @@
+import os
+from twilio.rest import Client
+
+twilio_account_sid = 'AC375b108aec8bd95874f124f8d5dd08a8'
+twilio_auth_token = '06ed9e1b5f45cf9004c0d7d138a58027'
+twilio_number = '+12705179916'
+
+client = Client(twilio_account_sid, twilio_auth_token)
+
+def send_message(number):
+    message = client.messages.create(
+                        body= "Doctor will be available today.",
+                        from_=twilio_number,
+                        to=number
+                    )
+
+    print(message.sid)
+
+def make_call(mobile):
+    try:
+        call = client.calls.create(
+                    to=mobile,
+                    from_=twilio_number,
+                    twiml=f"<Response><Say> Doctor will be available today. I reapeat. Doctor will be available today. </Say></Response>"
+                )
+        print(call.sid)
+        return True
+
+    except Exception as e:
+        print(e)
+        return False
+
+a = input("Enter first date : ")
+b = input("Enter second date : ")
+
+if(a==b):
+    send_message("+918778605473")
+    make_call("+918778605473")

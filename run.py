@@ -229,7 +229,7 @@ class Detect_Disease(Resource):
     
 class Test(Resource):
     def get(self):
-        return {'message':'Hello da dei'}
+        return "FloraX"
         
 api.add_resource(Test,'/')
 api.add_resource(Create_User, '/user/register')
