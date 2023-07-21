@@ -4,6 +4,8 @@ from datetime import datetime
 from pymongo import MongoClient
 from includes import keys, detect_plant
 import requests
+from bson import json_util
+import json
 
 app = Flask(__name__)
 api = Api(app)
@@ -13,6 +15,7 @@ db = mongo_client.florax
 users_collection = db.users
 plants_collection = db.plants
 disease_collection = db.diseases
+logs_collection = db.logs
 
 #Creating a new user
 create_user_args = reqparse.RequestParser()
@@ -57,6 +60,7 @@ create_plant_args.add_argument('health_benefits', required=True, type=str, help=
 create_plant_args.add_argument('culinary_uses', required=True, type=str, help='Culinary Uses of the plant is required.')
 create_plant_args.add_argument('common_diseases', required=True, type=str, help='Common Diseases of the plant is required.')
 create_plant_args.add_argument('display_img', required=True, type=str, help='First Pest of the plant is required.')
+
 #Pests
 create_plant_args.add_argument('pest_1', required=True, type=str, help='First Pest of the plant is required.')
 create_plant_args.add_argument('pest_1_img', required=True, type=str, help='First Pest of the plant is required.')
@@ -66,6 +70,7 @@ create_plant_args.add_argument('pest_3', required=True, type=str, help='Third Pe
 create_plant_args.add_argument('pest_3_img', required=True, type=str, help='Third Pest of the plant is required.')
 create_plant_args.add_argument('pest_4', required=True, type=str, help='Fourth Pest of the plant is required.')
 create_plant_args.add_argument('pest_4_img', required=True, type=str, help='Fourth Pest of the plant is required.')
+
 #culinary
 create_plant_args.add_argument('culinary_1', required=True, type=str, help='First Culinary of the plant is required.')
 create_plant_args.add_argument('culinary_1_img', required=True, type=str, help='First Culinary of the plant is required.')
@@ -73,6 +78,7 @@ create_plant_args.add_argument('culinary_2', required=True, type=str, help='Seco
 create_plant_args.add_argument('culinary_2_img', required=True, type=str, help='Second Culinary of the plant is required.')
 create_plant_args.add_argument('culinary_3', required=True, type=str, help='Third Culinary of the plant is required.')
 create_plant_args.add_argument('culinary_3_img', required=True, type=str, help='Third Culinary of the plant is required.')
+
 #disease
 create_plant_args.add_argument('disease_1', required=True, type=str, help='First Pest of the plant is required.')
 create_plant_args.add_argument('disease_1_img', required=True, type=str, help='First Pest of the plant is required.')
@@ -105,9 +111,21 @@ update_plant_args.add_argument('health_benefits_short', type=str, help='Health b
 update_plant_args.add_argument('description', type=str, help='Description of the plants in 2 or 3 lines.')
 update_plant_args.add_argument('appearance', type=str, help='Appearance of the plants in 2 or 3 lines.')
 update_plant_args.add_argument('growing_conditons', type=str, help='Growing Conditions of the plants in 2 or 3 lines.')
+
 #Getting Weather info
 get_weather_args = reqparse.RequestParser()
 get_weather_args.add_argument('city',required=True, type=str, help="City is required.")
+
+#Create logs
+update_logs_args = reqparse.RequestParser()
+update_logs_args.add_argument('datetime', required=True, type=str, help="DateTime is required.")
+update_logs_args.add_argument('animal',required=True, type=str, help="Name of the Animal is required.")
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return json_util.default(o)
+        return json.JSONEncoder.default(self, o)
 
 class Create_User(Resource):
     def put(self):
@@ -226,7 +244,28 @@ class Detect_Disease(Resource):
         print(plant_predicted)
         print('________________________')
         return plant_predicted
-    
+
+class Get_Logs(Resource):
+    def get(self):
+        res = []
+        logs = list(logs_collection.find())
+        for i in logs:
+            del i["_id"]
+            res.append(i)
+        return json.loads(json.dumps(res, indent=2, cls=JSONEncoder))
+
+class Update_Logs(Resource):
+    def put(self):
+        args = update_logs_args.parse_args()
+        args['datetime'] = datetime.fromisoformat(args['datetime'])
+        print(args)
+        try:
+            logs_collection.insert_one(args)
+
+            return {"message": "Log created successfully."}
+        except Exception as e:
+            return {"exception" : e}
+            
 class Test(Resource):
     def get(self):
         return "FloraX"
@@ -243,7 +282,8 @@ api.add_resource(Get_Disease, '/disease')
 api.add_resource(Detect_Disease, '/disease/detect') 
 api.add_resource(Create_Disease, '/disease/create')
 api.add_resource(Get_Weather, '/weather')
-
+api.add_resource(Get_Logs, '/logs')
+api.add_resource(Update_Logs, '/logs/update')
 
 if __name__ == '__main__':  
     app.run(host='0.0.0.0', port=5000, debug=True)
