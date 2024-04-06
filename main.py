@@ -284,6 +284,3 @@ api.add_resource(Create_Disease, '/disease/create')
 api.add_resource(Get_Weather, '/weather')
 api.add_resource(Get_Logs, '/logs')
 api.add_resource(Update_Logs, '/logs/update')
-
-if __name__ == '__main__':  
-    app.run(host='0.0.0.0', port=5000, debug=True)
